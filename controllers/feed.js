@@ -4,24 +4,22 @@ const Post = require('../models/post');
 
 
 exports.getPosts = (req, res, next) => {
+    Post.find()
+        .then(posts => {
+            res.status(200).json({ message: 'Fetched posts', posts: posts });
+        })
+        .catch(err => {
+            if (!err.statusCode) {
+                err.statusCode = 500;
+            }
+            next(err);
+        });
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         const error = new Error('Entered data is not correct');
         error.statusCode = 422;
         return error;
     }
-    res.status(200).json({
-        posts: [{
-            _id: '123',
-            title: 'First Post',
-            content: 'This is the first post!',
-            imageUrl: 'images/hp1.png',
-            creator: {
-                name: 'Antoan'
-            },
-            date: new Date()
-        }]
-    });
 };
 
 exports.createPost = (req, res, next) => {
@@ -47,4 +45,25 @@ exports.createPost = (req, res, next) => {
             }
             next(err);
         });
+};
+
+exports.getPost = (req, res, next) => {
+    const postId = req.params.postId;
+    Post.findById(postId)
+        .then(post => {
+            if (!post) {
+                const error = new Error('This post does not exist!');
+                error.statusCode = 404;
+                throw error;
+            }
+            res.status(200).json({ message: 'Post fetched', post: post });
+        })
+        .catch(
+            err => {
+                if (!err.statusCode) {
+                    err.statusCode = 500;
+                }
+                next(err);
+            }
+        );
 };

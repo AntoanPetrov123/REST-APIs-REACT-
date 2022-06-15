@@ -19,7 +19,7 @@ app.use((req, res, next) => {
 });
 
 app.use('/feed', feedRoutes);
-app.use('/images', express.static(path.join(_dirname, 'images')));
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.use((error, req, res, next) => {
     console.log(error);
