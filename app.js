@@ -1,5 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+const path = require('path');
+
 
 const feedRoutes = require('./routes/feed');
 
@@ -16,5 +19,19 @@ app.use((req, res, next) => {
 });
 
 app.use('/feed', feedRoutes);
+app.use('/images', express.static(path.join(_dirname, 'images')));
 
-app.listen(8080);
+app.use((error, req, res, next) => {
+    console.log(error);
+    const status = error.statusCode || 500;
+    const message = error.message;
+
+    res.status(status).json({ message: message });
+})
+
+mongoose.connect('mongodb+srv://antoan2:antoan2@cluster0.r2we3.mongodb.net/messages')
+    .then(result => {
+        app.listen(8080);
+    }).catch(err => {
+        console.log(err);
+    });
